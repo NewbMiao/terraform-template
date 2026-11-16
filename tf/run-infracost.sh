@@ -1,10 +1,23 @@
 #!/usr/bin/env bash
-# Infracost breakdown for infracost.yml projects (optional; not on pre-commit).
+# Infracost breakdown for infracost.yml projects (manual; pre-push uses tf/pre-commit-infracost.sh).
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-CONFIG="${ROOT}/infracost.yml"
+CONFIG="${ROOT}/tf/infracost.yml"
+ROOT_CONFIG_LINK="${ROOT}/infracost.yml"
+CONFIG_LINK_TARGET="tf/infracost.yml"
 CACHE="${ROOT}/.cache/infracost-baseline.json"
+
+ensure_infracost_root_link() {
+  if [[ -L "${ROOT_CONFIG_LINK}" ]] && [[ "$(readlink "${ROOT_CONFIG_LINK}")" == "${CONFIG_LINK_TARGET}" ]]; then
+    return 0
+  fi
+  if [[ -e "${ROOT_CONFIG_LINK}" && ! -L "${ROOT_CONFIG_LINK}" ]]; then
+    echo "ERROR: ${ROOT_CONFIG_LINK} must symlink ${CONFIG_LINK_TARGET} (remove the regular file)" >&2
+    exit 1
+  fi
+  ln -sf "${CONFIG_LINK_TARGET}" "${ROOT_CONFIG_LINK}"
+}
 
 usage() {
   cat <<EOF
@@ -35,6 +48,13 @@ if ! command -v infracost >/dev/null 2>&1; then
   echo "ERROR: infracost not in PATH. Install: brew install infracost" >&2
   exit 1
 fi
+
+if [[ ! -f "${CONFIG}" ]]; then
+  echo "ERROR: ${CONFIG} not found" >&2
+  exit 1
+fi
+
+ensure_infracost_root_link
 
 mkdir -p "${ROOT}/.cache"
 if [[ "${RESET}" -eq 1 && -f "${CACHE}" ]]; then

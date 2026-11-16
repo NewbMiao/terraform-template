@@ -1,5 +1,5 @@
 # Install: pre-commit install --hook-type pre-commit --hook-type pre-push && pre-commit install-hooks
-# Run: pre-commit run -a · pre-commit run terraform_checkov --all-files --hook-stage pre-push
+# Run: pre-commit run -a · pre-commit run --all-files --hook-stage pre-push
 
 default_install_hook_types: [pre-commit, pre-push]
 default_stages: [pre-commit]
@@ -23,34 +23,42 @@ repos:
           - --args=-json=false
       - id: terraform_docs
         args:
-          - --args=--config=.terraform-docs.yml
+          - --args=--config=tf/.terraform-docs.yml
           - --hook-config=--path-to-file=README.md
           - --hook-config=--add-to-existing-file=true
           - --hook-config=--create-file-if-not-exist=false
       - id: terraform_checkov
         stages: [pre-push]
         args:
-          - --args=--config-file=__GIT_WORKING_DIR__/.checkov.yaml
+          - --args=--config-file=__GIT_WORKING_DIR__/tf/.checkov.yaml
 
   - repo: local
     hooks:
       - id: terraform_validate_tflint
         name: tflint + OPA Rego tests
-        entry: scripts/tflint-env.sh
+        entry: tf/tflint-env.sh
         language: script
         require_serial: true
-        files: \.(tf|tfvars)$|^\.tflint\.hcl$|^\.tflint\.d/policies/|^scripts/tflint-env\.sh$
+        files: \.(tf|tfvars)$|^tf/\.tflint\.hcl$|^tf/\.tflint\.d/policies/|^tf/tflint-env\.sh$
       - id: tfpolicy_test
-        name: tfpolicy (policies/)
+        name: tfpolicy (tf/tfpolicy)
         language: script
-        entry: scripts/run-tfpolicy.sh
+        entry: tf/run-tfpolicy.sh
         args: [test]
         pass_filenames: false
         stages: [pre-commit]
-        files: ^(base|infra|policies)/
+        files: ^(base|infra|tf/tfpolicy)/
       - id: block_tf_sensitive_paths
         name: block committed .env and tfstate
         language: script
-        entry: scripts/pre-commit-block-sensitive-paths.sh
+        entry: tf/pre-commit-block-sensitive-paths.sh
         pass_filenames: false
         stages: [pre-commit]
+      - id: infracost_breakdown
+        name: infracost (tf/infracost.yml)
+        language: script
+        entry: tf/pre-commit-infracost.sh
+        args: [--verbose]
+        pass_filenames: false
+        always_run: true
+        stages: [pre-push]

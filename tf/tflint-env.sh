@@ -3,8 +3,8 @@
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-CFG="${ROOT}/.tflint.hcl"
-export TFLINT_OPA_POLICY_DIR="${ROOT}/.tflint.d/policies"
+CFG="${ROOT}/tf/.tflint.hcl"
+export TFLINT_OPA_POLICY_DIR="${ROOT}/tf/.tflint.d/policies"
 
 var_files_for() {
   local abs="$1"
@@ -70,7 +70,7 @@ run_dir() {
 }
 
 run_opa_rego_tests() {
-  echo "OPA Rego tests (.tflint.d/policies)"
+  echo "OPA Rego tests (tf/.tflint.d/policies)"
   TFLINT_OPA_POLICY_DIR="${TFLINT_OPA_POLICY_DIR}" \
     TFLINT_OPA_TEST=1 \
     tflint --config="${CFG}" --chdir="${ROOT}/base/platform"
@@ -85,7 +85,7 @@ dir_list=""
 run_opa=false
 for f in "$@"; do
   case "${f}" in
-    .tflint.hcl | .tflint.d/policies/* | scripts/tflint-env.sh)
+    tf/.tflint.hcl | tf/.tflint.d/policies/* | .tflint.hcl | .tflint.d/policies/* | tf/tflint-env.sh)
       run_opa=true
       continue
       ;;

@@ -1,6 +1,6 @@
 # TFLint: Terraform language + OPA naming (experimental).
-#   tflint --init --config=.tflint.hcl
-#   export TFLINT_OPA_POLICY_DIR="$(git rev-parse --show-toplevel)/.tflint.d/policies"
+#   tflint --init --config=tf/.tflint.hcl
+#   export TFLINT_OPA_POLICY_DIR="$(git rev-parse --show-toplevel)/tf/.tflint.d/policies"
 
 config {
   call_module_type = "local"

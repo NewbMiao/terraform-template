@@ -1,5 +1,6 @@
 resource "terraform_data" "workload" {
   input = {
+    environment        = var.environment
     team_name          = var.team_name
     name               = var.name
     workload_type      = var.workload_type

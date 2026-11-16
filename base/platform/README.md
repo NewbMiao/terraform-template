@@ -26,5 +26,5 @@ Shared network catalogue (`environment_networks` in tfvars).
 
 | Name | Description |
 | ---- | ----------- |
-| network\_by\_environment | Infra teams read this via remote\_state (keyed by environment). |
+| network\_by\_environment | Per-environment network outputs — copy into infra config platform\_network.auto.tfvars (template does not use terraform\_remote\_state). |
 <!-- END_TF_DOCS -->

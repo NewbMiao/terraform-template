@@ -1,5 +1,5 @@
 # Layout naming on terraform_data.input (cloud-neutral scaffold).
-# Keep in sync with policies/policies/data_naming.policy.hcl
+# Layout naming (TFLint/OPA); tfpolicy uses terraform_data_input.policy.hcl as the resource_policy example.
 
 package tflint
 

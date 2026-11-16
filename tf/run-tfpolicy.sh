@@ -1,10 +1,10 @@
 #!/bin/bash
-# Run policies/ with HashiCorp Terraform Policy CLI.
+# Run tf/tfpolicy/ with HashiCorp Terraform Policy CLI.
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
-POLICIES="${ROOT}/policies/policies"
-TESTS="${ROOT}/policies/tests"
+POLICIES="${ROOT}/tf/tfpolicy/policies"
+TESTS="${ROOT}/tf/tfpolicy/tests"
 
 usage() {
   echo "Usage: $0 [validate|test]" >&2

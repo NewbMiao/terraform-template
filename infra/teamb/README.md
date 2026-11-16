@@ -19,7 +19,8 @@ Team B infra — one state per `config/staging` and `config/prod`.
 
 | Name | Description | Required |
 | ---- | ----------- | :------: |
-| environment | Must match config/<environment>/ and a key in the platform state. | yes |
+| environment | Must match config/<environment>/. | yes |
+| platform\_network | Platform network for this environment — copy from ./tf.sh b platform output -json network\_by\_environment or your IPAM. | yes |
 | team\_name | Team slug; used in names and state paths. | yes |
 | workloads | Named workloads for this team in this environment. | yes |
 

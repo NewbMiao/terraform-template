@@ -1,4 +1,4 @@
-# terraform-docs — pre-commit hook passes --config=__GIT_WORKING_DIR__/.terraform-docs.yml
+# terraform-docs — pre-commit hook passes --config=__GIT_WORKING_DIR__/tf/.terraform-docs.yml
 
 formatter: "markdown table"
 version: ""

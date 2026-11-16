@@ -1,6 +1,6 @@
 variable "environment" {
   type        = string
-  description = "Must match config/<environment>/ and a key in the platform state."
+  description = "Must match config/<environment>/."
 
   validation {
     condition     = contains(["staging", "prod"], var.environment)
@@ -16,6 +16,15 @@ variable "team_name" {
     condition     = can(regex("^[a-z][a-z0-9-]*$", var.team_name))
     error_message = "team_name must be a lowercase slug."
   }
+}
+
+variable "platform_network" {
+  type = object({
+    network_id         = string
+    private_subnet_ids = list(string)
+    public_subnet_ids  = optional(list(string), [])
+  })
+  description = "Platform network for this environment — copy from ./tf.sh b platform output -json network_by_environment or your IPAM."
 }
 
 variable "workloads" {

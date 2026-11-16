@@ -1,4 +1,5 @@
-# Layout scaffold: terraform_data placeholders must carry an input map (no empty shells).
+# Enforced by ./tf/run-tfpolicy.sh test.
+# Kind: resource_policy  |  Phase: Plan  |  Data: attrs (paired pass/fail in tests/)
 
 resource_policy "terraform_data" "require_input" {
   enforcement_level = "mandatory"

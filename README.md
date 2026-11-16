@@ -1,62 +1,48 @@
 # terraform-template
 
-Starter layout: shared `base/`, team×env `infra/`. Skeleton uses `terraform_data` only — add your provider resources when you pick a cloud. Fictional names (`example-org`, `net-*` prefixes, sample teams `teama` / `teamb`).
+Portable **base + infra** Terraform starter (cloud-neutral `terraform_data` scaffold). Sample teams `teama` / `teamb` — rename dirs and run `./tf.sh conf -g` when you fork.
 
-## Layout
+```mermaid
+flowchart LR
+  S["Shared foundation\nbase/"]
+  T["Team workloads\ninfra/"]
+  E["Wrapper + guardrails\ntf.sh · tf/"]
 
-```
-base/
-  modules/network/
-  platform/          # network.auto.tfvars, platform.auto.tfvars, backend.hcl
-  permissions/       # permissions.auto.tfvars, roles.auto.tfvars, backend.hcl
-infra/
-  modules/workload/
-  teama|teamb/config/staging|prod/   # *.auto.tfvars, backend.hcl
-policies/            # tfpolicy (+ naming parity with TFLint OPA)
-.tflint.d/policies/  # TFLint OPA Rego (layout naming on terraform_data.input)
+  S -->|"apply first · then hand off\nplatform facts to teams"| T
+  E --> S
+  E --> T
 ```
 
-- **State:** one backend per `base/<scope>` and per `infra/<team>/config/<env>/`.
-- **base:** shared config; environments are tfvars keys, not extra folders.
-- **infra:** one state file per team and env (`staging`, `prod`).
+Shared and team layers use **separate state**. Platform context reaches teams through **checked-in config**, not `terraform_remote_state`. Sample `.tf` is placeholder until you wire your cloud; secrets stay in gitignored `.env`.
+
+```
+base/<scope>/          one state per scope (e.g. platform, permissions)
+infra/<team>/          team .tf + config/<env>/ (*.auto.tfvars, backend.hcl)
+tf.sh                  entrypoint wrapper
+tf/                    wrapper, policies, linters, infracost catalogue
+```
 
 ## Commands
 
 ```bash
-./terraform.sh base platform init
-./terraform.sh base platform plan -refresh=false
-./terraform.sh infra teama staging plan -refresh=false
+./tf.sh conf
+./tf.sh b platform init
+./tf.sh i teama staging plan -refresh=false
+./tf.sh -i              # menu (fzf)
 ```
 
-`terraform.sh` loads `TF_VAR_*` from `base/.env` or `infra/.env` (and stack-level `.env` if present). Do not pass secrets with `-var=` on the CLI.
+| Pattern | Meaning |
+|---------|---------|
+| `b <scope> <cmd>` | shared stack under `base/` |
+| `i <team> <env> <cmd>` | team stack + env tfvars |
 
-**Backend:** partial `backend "local" {}` in each stack; path or Terraform Cloud block in `backend.hcl` (commented placeholders).
-
-**Cross-stack reads:** `infra/*/data.tf` uses `terraform_remote_state` (local paths; remote variant in comments).
-
-**Secrets:** copy `base/.env.example` / `infra/.env.example` → `.env`, or TFC workspace variables. Nothing sensitive in git.
-
-## Dev tooling
-
-Install (macOS):
+## Tooling
 
 ```bash
-brew install tfenv pre-commit checkov infracost go terraform-docs
-brew install terraform-linters/tap/tflint
-brew tap hashicorp/tap && brew install hashicorp/tap/tfpolicy
-cd "$(git rev-parse --show-toplevel)" && tfenv install && tflint --init --config=.tflint.hcl
+tfenv install && tflint --init --config=tf/.tflint.hcl
 pre-commit install --hook-type pre-commit --hook-type pre-push
 ```
 
-| Hook / script | When |
-|---------------|------|
-| YAML, merge markers, whitespace, private keys | commit |
-| fmt, `terraform_docs` (stack `README.md`) | commit |
-| validate (pre-commit-terraform), `scripts/tflint-env.sh` (tflint + OPA) | commit |
-| `./scripts/run-tfpolicy.sh test` | commit |
-| checkov (`.checkov.yaml`) | push |
-| `./scripts/run-infracost.sh` | manual (needs API key) |
+Tooling configs live under `tf/`; optional root `infracost.yml` → `tf/infracost.yml` symlink.
 
-**Naming examples:** `data_naming.rego` and `data_naming.policy.hcl` — e.g. `input.resource_prefix` starts with `net-`, workload `input.name` without `_`.
-
-Stack docs: keep `<!-- BEGIN_TF_DOCS -->` in each stack `README.md`; pre-commit regenerates the block from `.tf` files (config `.terraform-docs.yml`).
+**Deeper setup** (pre-commit, tflint OPA, tfpolicy, checkov, infracost): see the Terraform on Azure book on Leanpub — **<https://leanpub.com/terraform-on-azure>**.

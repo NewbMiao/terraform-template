@@ -1,3 +1,8 @@
+variable "environment" {
+  type        = string
+  description = "Deployment environment (staging, prod, …) — must match config/<environment>/."
+}
+
 variable "team_name" {
   type        = string
   description = "Team slug."
