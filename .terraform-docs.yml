@@ -1,0 +1,53 @@
+# terraform-docs — pre-commit hook passes --config=__GIT_WORKING_DIR__/.terraform-docs.yml
+
+formatter: "markdown table"
+version: ""
+
+recursive:
+  enabled: false
+
+sections:
+  hide:
+    - providers
+    - resources
+    - data-sources
+  show: []
+
+content: |-
+  {{ .Requirements }}
+
+  {{ .Modules }}
+
+  {{ .Inputs }}
+
+  {{ .Outputs }}
+
+output:
+  file: README.md
+  mode: inject
+  template: |-
+    <!-- BEGIN_TF_DOCS -->
+    {{ .Content }}
+    <!-- END_TF_DOCS -->
+
+output-values:
+  enabled: false
+
+sort:
+  enabled: true
+  by: name
+
+settings:
+  anchor: false
+  color: false
+  default: false
+  description: true
+  escape: true
+  hide-empty: true
+  html: false
+  indent: 2
+  lockfile: false
+  read-comments: true
+  required: true
+  sensitive: true
+  type: false
