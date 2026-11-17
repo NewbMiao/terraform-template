@@ -1,5 +1,6 @@
 # Install: pre-commit install --hook-type pre-commit --hook-type pre-push && pre-commit install-hooks
 # Run: pre-commit run -a · pre-commit run --all-files --hook-stage pre-push
+# Infracost: manual only — pre-commit run infracost_breakdown --hook-stage manual
 
 default_install_hook_types: [pre-commit, pre-push]
 default_stages: [pre-commit]
@@ -61,4 +62,4 @@ repos:
         args: [--verbose]
         pass_filenames: false
         always_run: true
-        stages: [pre-push]
+        stages: [manual]
